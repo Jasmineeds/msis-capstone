@@ -154,7 +154,13 @@ export class GameManager {
             { icon: '🐕', title: 'Lesson 1: Vowels', desc: 'ㅏ ㅓ ㅗ ㅜ ㅣ' },
             { icon: '🐕', title: 'Lesson 2: Consonants', desc: 'ㄱ ㄴ ㄷ ㄹ ㅁ' },
             { icon: '🐺', title: 'Lesson 3: Basic Phrases', desc: '안녕하세요, 감사합니다' },
-            { icon: '🦊', title: 'Lesson 4: Numbers', desc: '일 이 삼 사 오...' }
+            { icon: '🦊', title: 'Lesson 4: Numbers', desc: '일 이 삼 사 오...' },
+            { icon: '🐕', title: 'Lesson 5: Self-Intro', desc: '저는 ___입니다' },
+            { icon: '🐺', title: 'Lesson 6: Native Numbers', desc: '하나 둘 셋 넷 다섯' },
+            { icon: '🦊', title: 'Lesson 7: Family', desc: '아빠 엄마 형 누나' },
+            { icon: '🐕', title: 'Lesson 8: Food', desc: '밥 김치 라면' },
+            { icon: '🐺', title: 'Lesson 9: Colors', desc: '빨간색 파란색 노란색' },
+            { icon: '🦊', title: 'Lesson 10: Review', desc: '초급 복습!' }
         ];
         
         lessonData.forEach((lesson, index) => {
@@ -177,11 +183,11 @@ export class GameManager {
             list.appendChild(item);
         });
         
-        menu.style.display = 'block';
+        menu.classList.add('show');
     }
 
     hideLessonMenu() {
-        document.getElementById('lesson-menu').style.display = 'none';
+        document.getElementById('lesson-menu').classList.remove('show');
     }
 
     selectLesson(index) {
