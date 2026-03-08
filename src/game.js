@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { lessons } from './lessons.js';
 import { saveProgress, submitScore, getCurrentUser } from './viverse.js';
 import { audioManager } from './audio.js';
+import { loadVRM, updateVRM, playIdleAnimation } from './vrmLoader.js';
 
 export class GameManager {
     constructor(scene, camera, shibaTeacher) {
@@ -60,6 +61,19 @@ export class GameManager {
 
     setPlayerName(name) {
         this.playerName = name;
+    }
+
+    async setAvatarUrl(url) {
+        this.avatarUrl = url;
+        console.log('Avatar URL set:', url);
+        
+        if (url) {
+            const vrm = await loadVRM(this.scene, url);
+            if (vrm) {
+                this.playerVRM = vrm;
+                playIdleAnimation();
+            }
+        }
     }
 
     setupControls() {

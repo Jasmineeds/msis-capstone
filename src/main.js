@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { createScene } from './scene.js';
 import { GameManager } from './game.js';
-import { initViverse, login, getCurrentUser, loadProgress, getStorageKeys } from './viverse.js';
+import { initViverse, login, getCurrentUser, loadProgress, getStorageKeys, getUserProfile, getActiveAvatar } from './viverse.js';
+import { updateVRM } from './vrmLoader.js';
 
 let scene, camera, renderer, shibaTeacher, gameManager;
 let playerName = '';
@@ -83,9 +84,21 @@ async function init() {
                 const user = await login();
                 console.log('Login result:', user);
                 if (user) {
-                    playerName = user.id;
-                    document.getElementById('player-name').textContent = `👤 ${playerName}`;
+                    const profile = await getUserProfile();
+                    playerName = profile?.name || user.id;
+                    
+                    const avatar = await getActiveAvatar();
+                    if (avatar?.headIconUrl) {
+                        document.getElementById('player-name').innerHTML = `<img src="${avatar.headIconUrl}" style="width:24px;height:24px;border-radius:50%;vertical-align:middle;margin-right:8px;">${playerName}`;
+                    } else {
+                        document.getElementById('player-name').textContent = `👤 ${playerName}`;
+                    }
+                    
                     gameManager.setPlayerName(playerName);
+                    if (avatar?.vrmUrl) {
+                        gameManager.setAvatarUrl(avatar.vrmUrl);
+                    }
+                    
                     document.getElementById('user-info').style.display = 'block';
                     document.getElementById('user-info').textContent = `Welcome, ${playerName}!`;
                     setTimeout(() => gameManager.start(), 1000);
@@ -108,13 +121,19 @@ async function init() {
     console.log('Game initialized successfully');
 }
 
+const clock = new THREE.Clock();
+
 function animate() {
     requestAnimationFrame(animate);
+    
+    const delta = clock.getDelta();
     
     if (shibaTeacher) {
         shibaTeacher.position.y = Math.sin(Date.now() * 0.002) * 0.05;
         shibaTeacher.rotation.y = Math.sin(Date.now() * 0.001) * 0.1;
     }
+    
+    updateVRM(delta);
     
     if (renderer && scene && camera) {
         renderer.render(scene, camera);
