@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { lessons } from './lessons.js';
-import { saveProgress, submitScore, getCurrentUser } from './viverse.js';
+import { saveProgress, submitScore, getLeaderboard, getCurrentUser } from './viverse.js';
 import { audioManager } from './audio.js';
 import { loadVRM, updateVRM, playIdleAnimation } from './vrmLoader.js';
 
@@ -140,7 +140,12 @@ export class GameManager {
         const lessonBtn = document.getElementById('lesson-btn');
         lessonBtn.addEventListener('click', () => this.showLessonMenu());
         
+        const leaderboardBtn = document.getElementById('leaderboard-btn');
+        leaderboardBtn.style.display = 'block';
+        leaderboardBtn.addEventListener('click', () => this.showLeaderboard());
+        
         window.closeLessonMenu = () => this.hideLessonMenu();
+        window.closeLeaderboard = () => this.hideLeaderboard();
         window.selectLesson = (index) => this.selectLesson(index);
     }
 
@@ -188,6 +193,38 @@ export class GameManager {
 
     hideLessonMenu() {
         document.getElementById('lesson-menu').classList.remove('show');
+    }
+
+    async showLeaderboard() {
+        const panel = document.getElementById('leaderboard-panel');
+        const list = document.getElementById('leaderboard-list');
+        
+        list.innerHTML = '<div style="text-align:center;padding:20px;">Loading...</div>';
+        panel.classList.add('show');
+        
+        try {
+            const entries = await getLeaderboard(10);
+            
+            if (entries.length === 0) {
+                list.innerHTML = '<div style="text-align:center;padding:20px;color:#666;">No scores yet. Be the first!</div>';
+                return;
+            }
+            
+            list.innerHTML = entries.map((entry, index) => `
+                <div class="leaderboard-item ${index < 3 ? 'top-3' : ''}">
+                    <span class="leaderboard-rank">${index < 3 ? ['🥇', '🥈', '🥉'][index] : index + 1}</span>
+                    <span class="leaderboard-name">${entry.user_name || 'Player'}</span>
+                    <span class="leaderboard-score">${entry.score} XP</span>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Failed to load leaderboard:', error);
+            list.innerHTML = '<div style="text-align:center;padding:20px;color:#c00;">Failed to load leaderboard</div>';
+        }
+    }
+
+    hideLeaderboard() {
+        document.getElementById('leaderboard-panel').classList.remove('show');
     }
 
     selectLesson(index) {

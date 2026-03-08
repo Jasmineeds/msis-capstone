@@ -7,9 +7,13 @@ const STORAGE_KEYS = {
 };
 
 const AVATAR_API_URL = 'https://sdk-api.viverse.com/';
+const VIVEPORT_URL = 'https://www.viveport.com/';
+const VIVERSE_COMMUNITY_URL = 'https://www.viverse.com/';
+const LEADERBOARD_NAME = 'xp_leaderboard';
 
 let viverseClient = null;
 let avatarClient = null;
+let gameDashboardClient = null;
 let currentUser = null;
 let authResult = null;
 
@@ -104,15 +108,6 @@ export function getStorageKeys() {
     return STORAGE_KEYS;
 }
 
-export async function submitScore(score) {
-    console.log('Score recorded:', score);
-    return true;
-}
-
-export async function getLeaderboard(limit = 10) {
-    return [];
-}
-
 export function isViverseReady() {
     return viverseClient !== null;
 }
@@ -196,6 +191,96 @@ export async function getPublicAvatars() {
         return avatars;
     } catch (error) {
         console.error('Failed to get public avatars:', error);
+        return [];
+    }
+}
+
+async function initGameDashboard() {
+    if (!viverseClient) {
+        console.warn('VIVERSE client not initialized');
+        return null;
+    }
+    
+    try {
+        const accessToken = await viverseClient.getToken();
+        if (!accessToken) {
+            console.warn('No access token for leaderboard');
+            return null;
+        }
+        
+        gameDashboardClient = new globalThis.viverse.gameDashboard({
+            baseURL: VIVEPORT_URL,
+            communityBaseURL: VIVERSE_COMMUNITY_URL,
+            token: accessToken
+        });
+        
+        console.log('Game Dashboard client initialized');
+        return gameDashboardClient;
+    } catch (error) {
+        console.error('Game Dashboard init failed:', error);
+        return null;
+    }
+}
+
+export async function submitScore(score) {
+    if (!gameDashboardClient) {
+        await initGameDashboard();
+    }
+    
+    if (!gameDashboardClient) {
+        console.warn('Cannot submit score: not logged in');
+        return false;
+    }
+    
+    try {
+        await gameDashboardClient.uploadLeaderboardScore(APP_ID, [
+            { name: LEADERBOARD_NAME, value: String(score) }
+        ]);
+        console.log('Score submitted:', score);
+        return true;
+    } catch (error) {
+        console.error('Failed to submit score:', error);
+        return false;
+    }
+}
+
+export async function getLeaderboard(limit = 10) {
+    if (!gameDashboardClient) {
+        await initGameDashboard();
+    }
+    
+    if (!gameDashboardClient) {
+        try {
+            const guestClient = new globalThis.viverse.gameDashboard({
+                baseURL: VIVEPORT_URL,
+                communityBaseURL: VIVERSE_COMMUNITY_URL,
+                token: ''
+            });
+            const result = await guestClient.getGuestLeaderboard(APP_ID, {
+                name: LEADERBOARD_NAME,
+                range_start: 1,
+                range_end: limit,
+                region: 'global',
+                time_range: 'alltime'
+            });
+            return result?.entries || [];
+        } catch (error) {
+            console.error('Failed to get guest leaderboard:', error);
+            return [];
+        }
+    }
+    
+    try {
+        const result = await gameDashboardClient.getLeaderboard(APP_ID, {
+            name: LEADERBOARD_NAME,
+            range_start: 1,
+            range_end: limit,
+            region: 'global',
+            time_range: 'alltime'
+        });
+        return result?.entries || [];
+    } catch (error) {
+        console.error('Failed to get leaderboard:', error);
         return [];
     }
 }

@@ -318,9 +318,77 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        #lesson-menu.show {
+        #lesson-menu.show,
+        #leaderboard-panel.show {
             display: flex;
             flex-direction: column;
+        }
+
+        #leaderboard-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 25px;
+            padding: 30px;
+            z-index: 150;
+            display: none;
+            min-width: 350px;
+            max-height: 80vh;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        #leaderboard-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 50vh;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: #f8f8f8;
+            border-radius: 10px;
+        }
+
+        .leaderboard-item.top-3 {
+            background: linear-gradient(135deg, #ffd700 0%, #ffec8b 100%);
+        }
+
+        .leaderboard-rank {
+            font-size: 20px;
+            font-weight: bold;
+            width: 40px;
+            color: #333;
+        }
+
+        .leaderboard-name {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .leaderboard-score {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4a90d9;
+        }
+
+        #leaderboard-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 140px;
+            padding: 12px 20px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            z-index: 100;
         }
 
         #lesson-list {
@@ -465,6 +533,9 @@
 
         <!-- Lesson Button -->
         <button id="lesson-btn" style="display: none;">📚 Select Lesson</button>
+        
+        <!-- Leaderboard Button -->
+        <button id="leaderboard-btn" style="display: none;">🏆 Leaderboard</button>
 
         <!-- Hint -->
         <div id="hint">Click on Shiba Teacher to start Lesson 1!</div>
@@ -474,6 +545,13 @@
             <button class="close-menu" onclick="closeLessonMenu()">✕</button>
             <div class="lesson-menu-title">📚 Select Lesson</div>
             <div id="lesson-list"></div>
+        </div>
+
+        <!-- Leaderboard Panel -->
+        <div id="leaderboard-panel">
+            <button class="close-menu" onclick="closeLeaderboard()">✕</button>
+            <div class="lesson-menu-title">🏆 Leaderboard</div>
+            <div id="leaderboard-list"></div>
         </div>
 
         <!-- Dialogue Box -->
