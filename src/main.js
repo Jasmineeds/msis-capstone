@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { createScene } from './scene.js';
 import { GameManager } from './game.js';
 import { initViverse, login, getCurrentUser, loadProgress, getStorageKeys, getUserProfile, getActiveAvatar } from './viverse.js';
-import { updateVRM } from './vrmLoader.js';
+import { updateVRM, setupAvatarControls, updateAvatarMovement } from './vrmLoader.js';
 
 let scene, camera, renderer, shibaTeacher, gameManager;
 let playerName = '';
@@ -97,6 +97,7 @@ async function init() {
                     gameManager.setPlayerName(playerName);
                     if (avatar?.vrmUrl) {
                         gameManager.setAvatarUrl(avatar.vrmUrl);
+                        setupAvatarControls();
                     }
                     
                     document.getElementById('user-info').style.display = 'block';
@@ -134,6 +135,7 @@ function animate() {
     }
     
     updateVRM(delta);
+    updateAvatarMovement();
     
     if (renderer && scene && camera) {
         renderer.render(scene, camera);
