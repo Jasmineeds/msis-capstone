@@ -1,0 +1,17 @@
+{
+  "name": "woof-korean-academy",
+  "version": "1.0.0",
+  "description": "汪語學院 - 韓文學習遊戲",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
